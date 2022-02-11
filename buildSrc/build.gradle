@@ -5,13 +5,19 @@ plugins {
 }
 
 repositories {
-	mavenCentral()
-	gradlePluginPortal()
-	maven { url "https://repo.spring.io/release" }
+   maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+   maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+   maven { url "https://repo.spring.io/plugins-release" }
+   mavenCentral()
+   gradlePluginPortal()
+   maven { url "https://repo.spring.io/release" }
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+sourceCompatibility = 8
+targetCompatibility = 8
 
 dependencies {
 	checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}"
