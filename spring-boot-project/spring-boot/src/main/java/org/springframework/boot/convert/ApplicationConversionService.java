@@ -16,9 +16,6 @@
 
 package org.springframework.boot.convert;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
@@ -33,6 +30,9 @@ import org.springframework.format.Printer;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.util.StringValueResolver;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A specialization of {@link FormattingConversionService} configured by default with
@@ -72,6 +72,7 @@ public class ApplicationConversionService extends FormattingConversionService {
 	 * {@code null})
 	 */
 	public static ConversionService getSharedInstance() {
+		// DCL 双重检测机制
 		ApplicationConversionService sharedInstance = ApplicationConversionService.sharedInstance;
 		if (sharedInstance == null) {
 			synchronized (ApplicationConversionService.class) {

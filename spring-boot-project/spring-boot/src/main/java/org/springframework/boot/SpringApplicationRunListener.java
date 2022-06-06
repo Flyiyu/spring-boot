@@ -38,6 +38,7 @@ public interface SpringApplicationRunListener {
 	/**
 	 * Called immediately when the run method has first started. Can be used for very
 	 * early initialization.
+	 * 在 run 方法第一次启动时立即调用。可用于非常早的初始化。
 	 */
 	default void starting() {
 	}
@@ -46,6 +47,7 @@ public interface SpringApplicationRunListener {
 	 * Called once the environment has been prepared, but before the
 	 * {@link ApplicationContext} has been created.
 	 * @param environment the environment
+	 * 当environment准备完成，在ApplicationContext创建之前，该方法被调用
 	 */
 	default void environmentPrepared(ConfigurableEnvironment environment) {
 	}
