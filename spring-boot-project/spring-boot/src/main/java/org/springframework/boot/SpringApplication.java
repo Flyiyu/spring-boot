@@ -296,7 +296,7 @@ public class SpringApplication {
 		try {
 			// 加载并解析命令行的参数到ApplicationArguments对象中
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
-			// 第二步：根据SpringApplicationRunListeners以及参数来准备环境
+			// 第二步：根据SpringApplicationRunListeners以及参数来准备环境 加载配置文件中的配置参数
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
 			configureIgnoreBeanInfo(environment);
 			// 准备打印banner
@@ -362,12 +362,12 @@ public class SpringApplication {
 													   ApplicationArguments applicationArguments) {
 		// 根据不同的web类型创建不同实现的Environment对象
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
-		// 配置环境
+		// 配置环境 主要是PropertySources 和ActiveProrifles的配置
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		// 如果propertySources中没有`configurationProperties`则将`ConfigurationPropertySourcesPropertySource {name='configurationProperties'}`加入到propertySources中。
 		// 有的话先移除，然后再加。
 		ConfigurationPropertySources.attach(environment);
-		// 通知 SpringApplicationRunListener 的数组，环境变量已经准备完成 // 发送环境已准备完成事件
+		// 加载配置文件 application.yml 和其他配置文件的参数
 		listeners.environmentPrepared(environment);
 		// 绑定环境中spring.main属性绑定到SpringApplication对象中
 		bindToSpringApplication(environment);
@@ -471,6 +471,7 @@ public class SpringApplication {
 		 * getOrDefault
 		 * 	    1.获取上面返回map中的ApplicationContextInitializer的接口
 		 */
+		// MultiValueMap 一个键可以多个值，相同的键，值可以转为集合，达到一个key获取一个集合
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
 		// 通过反射实例化对象
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
@@ -534,7 +535,7 @@ public class SpringApplication {
 		}
 		// 配置property sources, 将“SimpleCommandLinePropertySource {name='commandLineArgs'}”添加到ConfigurableEnvironment的propertySourceList。
 		configurePropertySources(environment, args);
-		// 配置profiles
+		// 配置profiles 对应属性spring.profiles.active
 		configureProfiles(environment, args);
 	}
 
@@ -546,11 +547,15 @@ public class SpringApplication {
 	 * @param args        arguments passed to the {@code run} method
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
 	 */
+	/**
+	 * 属性的优先级顺序，默认的配置属性放在最后，优先级最低
+	 */
 	protected void configurePropertySources(ConfigurableEnvironment environment, String[] args) {
 		MutablePropertySources sources = environment.getPropertySources();
 		if (this.defaultProperties != null && !this.defaultProperties.isEmpty()) {
 			sources.addLast(new MapPropertySource("defaultProperties", this.defaultProperties));
 		}
+		// 判断命令行属性是否存在
 		if (this.addCommandLineProperties && args.length > 0) {
 			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
 			if (sources.contains(name)) {
@@ -580,6 +585,7 @@ public class SpringApplication {
 	protected void configureProfiles(ConfigurableEnvironment environment, String[] args) {
 		Set<String> profiles = new LinkedHashSet<>(this.additionalProfiles);
 		profiles.addAll(Arrays.asList(environment.getActiveProfiles()));
+		// 一般情况下setActiveProfiles设置的是null,因为我们都是在application.properties文件指定的，而不会再运行变量中指定profile.
 		environment.setActiveProfiles(StringUtils.toStringArray(profiles));
 	}
 
